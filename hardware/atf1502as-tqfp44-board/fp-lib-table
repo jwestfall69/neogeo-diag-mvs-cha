@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "neogeo-diag")(type "KiCad")(uri "${KIPRJMOD}/../common/neogeo-diag/neogeo-diag.pretty")(options "")(descr ""))
+)
