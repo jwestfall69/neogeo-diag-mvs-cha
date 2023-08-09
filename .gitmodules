@@ -1,0 +1,3 @@
+[submodule "hardware/common/neogeo-diag"]
+	path = hardware/common/neogeo-diag
+	url = ../neogeo-diag-kicad-library.git
