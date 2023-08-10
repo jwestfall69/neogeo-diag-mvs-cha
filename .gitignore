@@ -30,3 +30,12 @@ fp-info-cache
 
 # Exported gerber files
 hw-rev-*
+
+# wincupl generated files we don't need
+/firmware/atf1502as-plcc44/*
+/firmware/atf1502as-tqfp44/*
+/firmware/atf1504as-plcc44/*
+/firmware/atf1504as-tqfp44/*
+!/firmware/**/*.jed
+!/firmware/**/*.pld
+!/firmware/**/*.svf

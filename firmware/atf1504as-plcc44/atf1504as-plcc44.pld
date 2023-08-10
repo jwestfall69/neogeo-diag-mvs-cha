@@ -1,0 +1,5 @@
+Name     atf1504as-plcc44;
+Device   f1504ispplcc44;
+
+$INCLUDE ..\common\pins-plcc44.pld
+$INCLUDE ..\common\neo-zmc.pld

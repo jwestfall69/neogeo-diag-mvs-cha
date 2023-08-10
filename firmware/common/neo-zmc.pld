@@ -1,0 +1,131 @@
+PartNo   00;
+Date     7/5/2023;
+Revision 01;
+Designer ack;
+Company  None;
+Assembly None;
+Location None;
+
+/*
+  Information and logic below comes from a combination of the
+  following sources:
+
+  https://wiki.neogeodev.org/index.php?title=NEO-ZMC
+  https://wiki.neogeodev.org/index.php?title=Z80_bankswitching
+  https://github.com/MiSTer-devel/NeoGeo_MiSTer/blob/master/rtl/io/zmc.v
+  https://github.com/neogeodev/NeoGeoFPGA-sim/blob/master/Cartridge/zmc.v
+  https://github.com/mamedev/mame/blob/master/src/mame/neogeo/neogeo.cpp
+
+  The NEO-GEO diag m1 rom uses a 27c010/27c1001 eprom, which only has address
+  lines up to A16.  A real NEO-ZMC has logic to support M1 roms with up to
+  an A18 address line.  However since the diag m1 doesnt need A17 and A18, the
+  logic needed to handle these address lines has been removed.  Doing this
+  makes it possible for the logic below to fit in a ATF1502AS which only has
+  32 macrocells (full A17,A18 support requires 34 macrocells)
+ 
+*/
+
+
+/*
+  zone latch registers
+
+  These get mapped to the upper address lines of the M1 rom
+  when the Z80 requests data from a zone's address range. Note:
+  I'm using zone names A-D instead of 0-3 from the docs so the
+  code is easier to read and doesn't confuse wincupl.
+
+  zone A:  2k zone, 8bit latch, address range 0xf000 to 0xf7ff
+  zone B:  4k zone, 7bit latch, address range 0xe000 to 0xefff
+  zone C:  8k zone, 6bit latch, address range 0xc000 to 0xdfff
+  zone D: 16k zone, 5bit latch, address range 0x8000 to 0xbfff
+*/
+
+/* *************** PINNODES    *********************/
+NODE [ZA5..ZA0];
+NODE [ZB4..ZB0];
+NODE [ZC3..ZC0];
+NODE [ZD2..ZD0];
+
+
+/*
+  These define when the latches get updated for each zone.  In order
+  for a zone's latch bits to be updated the following must be met.
+  - rising edge of SDRD0
+  - .ce (clock enable) logic must evaluate to 1
+
+  zone A: sda1 is 0, sda0 is 0
+  zone B: sda1 is 0, sda0 is 1
+  zone C: sda1 is 1, sda0 is 0
+  zone D: sda1 is 1, sda0 is 1
+
+*/
+
+[ZA5..ZA0].ck = SDRD0;
+[ZA5..ZA0].ce = !SDA1 & !SDA0;
+[ZA5..ZA0].d = [SDA13..SDA8];
+
+[ZB4..ZB0].ck = SDRD0;
+[ZB4..ZB0].ce = !SDA1 & SDA0;
+[ZB4..ZB0].d = [SDA12..SDA8];
+
+[ZC3..ZC0].ck = SDRD0;
+[ZC3..ZC0].ce = SDA1 & !SDA0;
+[ZC3..ZC0].d = [SDA11..SDA8];
+
+[ZD2..ZD0].ck = SDRD0;
+[ZD2..ZD0].ce = SDA1 & SDA0;
+[ZD2..ZD0].d = [SDA10..SDA8];
+
+/*
+  These are used to identify when a read from the
+  Z80 is within a zone's range or none of them.
+*/
+$DEFINE ZA_RANGE  SDA15 &  SDA14 &  SDA13 &  SDA12
+$DEFINE ZB_RANGE  SDA15 &  SDA14 &  SDA13 & !SDA12
+$DEFINE ZC_RANGE  SDA15 &  SDA14 & !SDA13
+$DEFINE ZD_RANGE  SDA15 & !SDA14
+$DEFINE NO_RANGE !SDA15
+
+/*
+  Set the upper M1 ROM address lines based on which
+  zone (if any) is being read from.  If the read is
+  not from in zone we need to pass along SDA15:11
+  to MA15:11
+
+  Note that 27c010/27c1001 eproms only go up to A16,
+  so MA17/MA18 aren't really used.
+*/
+MA16 = ZA_RANGE & ZA5
+     # ZB_RANGE & ZB4
+     # ZC_RANGE & ZC3
+     # ZD_RANGE & ZD2;
+
+MA15 = ZA_RANGE & ZA4
+     # ZB_RANGE & ZB3
+     # ZC_RANGE & ZC2
+     # ZD_RANGE & ZD1
+     # NO_RANGE & SDA15;
+
+MA14 = ZA_RANGE & ZA3
+     # ZB_RANGE & ZB2
+     # ZC_RANGE & ZC1
+     # ZD_RANGE & ZD0
+     # NO_RANGE & SDA14;
+
+MA13 = ZA_RANGE & ZA2
+     # ZB_RANGE & ZB1
+     # ZC_RANGE & ZC0
+     # ZD_RANGE & SDA13
+     # NO_RANGE & SDA13;
+
+MA12 = ZA_RANGE & ZA1
+     # ZB_RANGE & ZB0
+     # ZC_RANGE & SDA12
+     # ZD_RANGE & SDA12
+     # NO_RANGE & SDA12;
+
+MA11 = ZA_RANGE & ZA0
+     # ZB_RANGE & SDA11
+     # ZC_RANGE & SDA11
+     # ZD_RANGE & SDA11
+     # NO_RANGE & SDA11;

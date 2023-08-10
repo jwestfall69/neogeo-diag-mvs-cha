@@ -1,0 +1,7 @@
+/* input pins for tqfp */
+PIN 37 = SDRD0;
+PIN [21,22] = [SDA0,SDA1];
+PIN [27,25,23,15,14,13,12,11] = [SDA8..SDA15];
+
+/* output pins for tqfp */
+PIN [31,33,34,43,42,44] = [MA11..MA16];

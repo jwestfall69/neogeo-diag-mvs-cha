@@ -1,0 +1,7 @@
+/* input pins for plcc */
+PIN 43 = SDRD0;
+PIN [24,26] = [SDA0,SDA1];
+PIN [33,31,29,21,20,19,18,17] = [SDA8..SDA15];
+
+/* output pins for plcc */
+PIN [37,39,40,4,5,6] = [MA11..MA16];
