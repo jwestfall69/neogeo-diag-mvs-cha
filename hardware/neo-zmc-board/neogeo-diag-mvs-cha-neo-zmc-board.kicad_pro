@@ -409,7 +409,7 @@
     ]
   },
   "meta": {
-    "filename": "neogeo-diag-mvs-cha.kicad_pro",
+    "filename": "neogeo-diag-mvs-cha-neo-zmc-board.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -517,6 +517,6 @@
     ]
   ],
   "text_variables": {
-    "REV": "2023-07-16"
+    "REV": "2023-08-12"
   }
 }
