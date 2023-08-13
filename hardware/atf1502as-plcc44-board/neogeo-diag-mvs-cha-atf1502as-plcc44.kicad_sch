@@ -1825,7 +1825,7 @@
     (effects (font (size 3 3)) (justify left bottom))
     (uuid d8cfa213-f1e5-4992-8fb6-16007f61d474)
   )
-  (text "M1 ROM + CPLD (PLCC)" (at 290.83 147.955 0)
+  (text "M1 ROM + Address Logic" (at 284.48 146.05 0)
     (effects (font (size 3 3)) (justify left bottom))
     (uuid fec87dbb-5963-40d8-8c6f-22bb010205bf)
   )
